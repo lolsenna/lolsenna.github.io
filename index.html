@@ -3,22 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dog Daycare Manager - Live Firebase</title>
+<title>Dog Daycare Manager - Sleek Version</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-    body { background-color: #121212; color: #e0e0e0; }
-    .dog-card { border-radius: 10px; padding: 15px; color: white; transition: 0.3s; }
-    .status-grey { background-color: #444; }
-    .status-purple { background-color: #6a0dad; }
-    .status-blue { background-color: #007bff; }
-    .status-green { background-color: #28a745; }
-    .dog-actions button { margin-right: 5px; }
+body {
+    background-color: #1c1c1e;
+    color: #f5f5f7;
+    font-family: 'Inter', sans-serif;
+}
+h1 { font-weight: 600; margin-bottom: 2rem; text-align: center; }
+.dashboard-counter {
+    flex: 1;
+    padding: 15px 20px;
+    border-radius: 16px;
+    background: #2c2c2e;
+    text-align: center;
+    font-weight: 500;
+    transition: transform 0.2s;
+}
+.dashboard-counter:hover { transform: translateY(-2px); }
+.dog-card {
+    background: #2c2c2e;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.dog-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.status-grey { background-color: #3a3a3c !important; }
+.status-purple { background-color: #8e44ad !important; }
+.status-blue { background-color: #007aff !important; }
+.status-green { background-color: #28a745 !important; }
+.dog-actions button {
+    margin-right: 8px;
+    margin-top: 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+input, select {
+    border-radius: 12px;
+    border: none;
+    background: #2c2c2e;
+    color: #f5f5f7;
+}
+input:focus, select:focus { outline: none; box-shadow: 0 0 0 2px #007aff; }
+.modal-content { border-radius: 20px; background: #2c2c2e; color: #f5f5f7; }
+.btn { border-radius: 12px; font-weight: 500; }
 </style>
 </head>
 <body class="p-3">
 
 <div class="container">
-    <h1 class="text-center mb-4">🐾 Dog Daycare Manager (Live)</h1>
+    <h1>🐾 Dog Daycare Manager</h1>
+
+    <!-- Dashboard Counters -->
+    <div class="d-flex gap-4 mb-4 flex-wrap">
+        <div class="dashboard-counter">
+            Total Dogs: <span id="totalDogs">0</span>
+        </div>
+        <div class="dashboard-counter">
+            Currently Staying: <span id="stayingDogs">0</span>
+        </div>
+    </div>
 
     <!-- Controls -->
     <div class="d-flex flex-wrap mb-3 gap-2">
@@ -36,6 +83,7 @@
         <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#staying">Currently Staying</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#notStaying">Not Staying</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#allDogs">All Dogs</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#logs">Logs</button></li>
     </ul>
 
     <!-- Tab Content -->
@@ -43,13 +91,14 @@
         <div class="tab-pane fade show active" id="staying"></div>
         <div class="tab-pane fade" id="notStaying"></div>
         <div class="tab-pane fade" id="allDogs"></div>
+        <div class="tab-pane fade" id="logs"></div>
     </div>
 </div>
 
 <!-- Add Dog Modal -->
 <div class="modal fade" id="addDogModal" tabindex="-1">
   <div class="modal-dialog">
-    <div class="modal-content bg-dark text-white">
+    <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Add New Dog</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -73,8 +122,8 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBucpC5LlqzyQfn2fLfqxSoKRe9Zl8kmyU",
@@ -86,11 +135,10 @@ const firebaseConfig = {
   appId: "1:332904713754:web:85c455b1e769050ef20ba3",
   measurementId: "G-45XJ8K2NNB"
 };
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const THREE_HOURS = 3 * 60 * 60 * 1000;
+const THREE_HOURS = 3*60*60*1000;
 const addDogModal = new bootstrap.Modal(document.getElementById('addDogModal'));
 let dogs = {};
 
@@ -98,96 +146,107 @@ document.getElementById('searchInput').addEventListener('input', render);
 document.getElementById('sortSelect').addEventListener('change', render);
 
 function showAddDogModal() { addDogModal.show(); }
-
 function addDog() {
-    const name = document.getElementById('dogName').value.trim();
-    const age = parseInt(document.getElementById('dogAge').value);
-    const owner = document.getElementById('ownerName').value.trim();
-    const sex = document.getElementById('dogSex').value;
-    if (!name || !age || !owner) return alert('Please fill in all fields');
-
+    const name=document.getElementById('dogName').value.trim();
+    const age=parseInt(document.getElementById('dogAge').value);
+    const owner=document.getElementById('ownerName').value.trim();
+    const sex=document.getElementById('dogSex').value;
+    if(!name||!age||!owner) return alert('Fill all fields');
     const id = Date.now();
-    db.ref('dogs/' + id).set({ id, name, age, owner, sex, staying: true, lastFed: null, lastPotty: null });
+    db.ref('dogs/'+id).set({id,name,age,owner,sex,staying:true,lastFed:null,lastPotty:null});
+
+    addLog({id,name,owner,action:'arrived'});
     addDogModal.hide();
 }
 
 function toggleStay(id) {
     const dog = dogs[id];
-    db.ref('dogs/' + id).update({ staying: !dog.staying, lastFed: null, lastPotty: null });
+    const newStaying = !dog.staying;
+    db.ref('dogs/' + id).update({ staying: newStaying, lastFed: null, lastPotty: null });
+    addLog({id: dog.id, name: dog.name, owner: dog.owner, action: newStaying ? 'arrived' : 'sent home'});
 }
 
-function feedDog(id) {
-    const dog = dogs[id];
-    const newVal = (dog.lastFed && Date.now() - dog.lastFed <= THREE_HOURS) ? null : Date.now();
-    db.ref('dogs/' + id).update({ lastFed: newVal });
-}
+function feedDog(id) { const dog=dogs[id]; const newVal=(dog.lastFed && Date.now()-dog.lastFed<=THREE_HOURS)?null:Date.now(); db.ref('dogs/'+id).update({lastFed:newVal}); }
+function pottyDog(id) { const dog=dogs[id]; const newVal=(dog.lastPotty && Date.now()-dog.lastPotty<=THREE_HOURS)?null:Date.now(); db.ref('dogs/'+id).update({lastPotty:newVal}); }
+function resetAllStatus() { Object.values(dogs).forEach(d=>{if(d.staying) db.ref('dogs/'+d.id).update({lastFed:null,lastPotty:null});}); }
 
-function pottyDog(id) {
-    const dog = dogs[id];
-    const newVal = (dog.lastPotty && Date.now() - dog.lastPotty <= THREE_HOURS) ? null : Date.now();
-    db.ref('dogs/' + id).update({ lastPotty: newVal });
-}
-
-function resetAllStatus() {
-    Object.values(dogs).forEach(dog => {
-        if (dog.staying) db.ref('dogs/' + dog.id).update({ lastFed: null, lastPotty: null });
-    });
+function addLog({id,name,owner,action}) {
+    const totalNow = Object.values(dogs).filter(d => d.staying || d.id===id && action==='arrived').length;
+    const logEntry = { dogId:id, dogName:name, ownerName:owner, action, timestamp:Date.now(), totalDogsAfterAction:totalNow };
+    const newLogKey = db.ref('Logs').push().key;
+    db.ref('Logs/'+newLogKey).set(logEntry);
 }
 
 function getStatusClass(dog) {
-    const now = Date.now();
-    const fedRecent = dog.lastFed && now - dog.lastFed <= THREE_HOURS;
-    const pottyRecent = dog.lastPotty && now - dog.lastPotty <= THREE_HOURS;
-
-    if (fedRecent && pottyRecent) return 'status-green';
-    if (fedRecent) return 'status-purple';
-    if (pottyRecent) return 'status-blue';
+    const now=Date.now(); const fed=dog.lastFed && now-dog.lastFed<=THREE_HOURS; const potty=dog.lastPotty && now-dog.lastPotty<=THREE_HOURS;
+    if(fed && potty) return 'status-green';
+    if(fed) return 'status-purple';
+    if(potty) return 'status-blue';
     return 'status-grey';
 }
 
 function render() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const sort = document.getElementById('sortSelect').value;
-    const stayingDiv = document.getElementById('staying');
-    const notStayingDiv = document.getElementById('notStaying');
-    const allDogsDiv = document.getElementById('allDogs');
+    // Dashboard
+    document.getElementById('totalDogs').innerText = Object.keys(dogs).length;
+    document.getElementById('stayingDogs').innerText = Object.values(dogs).filter(d=>d.staying).length;
+
+    const search=document.getElementById('searchInput').value.toLowerCase();
+    const sort=document.getElementById('sortSelect').value;
+    const stayingDiv=document.getElementById('staying');
+    const notStayingDiv=document.getElementById('notStaying');
+    const allDogsDiv=document.getElementById('allDogs');
 
     const dogArray = Object.values(dogs)
-        .filter(d => d.name.toLowerCase().includes(search) || d.owner.toLowerCase().includes(search))
-        .sort((a,b) => sort==='name'? a.name.localeCompare(b.name) : a.age - b.age);
+        .filter(d=>d.name.toLowerCase().includes(search)||d.owner.toLowerCase().includes(search))
+        .sort((a,b)=>sort==='name'?a.name.localeCompare(b.name):a.age-b.age);
 
-    stayingDiv.innerHTML = '';
-    notStayingDiv.innerHTML = '';
-    allDogsDiv.innerHTML = '';
+    stayingDiv.innerHTML=''; notStayingDiv.innerHTML=''; allDogsDiv.innerHTML='';
 
-    dogArray.forEach(dog => {
-        const card = document.createElement('div');
-        card.className = `dog-card mb-3 ${getStatusClass(dog)}`;
-        card.innerHTML = `
+    dogArray.forEach(dog=>{
+        const card=document.createElement('div');
+        card.className=`dog-card ${getStatusClass(dog)}`;
+        card.innerHTML=`
             <h5>${dog.name} (${dog.age} yrs, ${dog.sex})</h5>
             <p>Owner: ${dog.owner}</p>
-            <p>Last Fed: ${dog.lastFed ? new Date(dog.lastFed).toLocaleTimeString() : 'Not yet'}</p>
-            <p>Last Potty: ${dog.lastPotty ? new Date(dog.lastPotty).toLocaleTimeString() : 'Not yet'}</p>
+            <p>Last Fed: ${dog.lastFed?new Date(dog.lastFed).toLocaleTimeString():'Not yet'}</p>
+            <p>Last Potty: ${dog.lastPotty?new Date(dog.lastPotty).toLocaleTimeString():'Not yet'}</p>
             <div class="dog-actions">
-                ${dog.staying ? `
+                ${dog.staying?`
                 <button class="btn btn-sm btn-light" onclick="feedDog(${dog.id})">Feed</button>
                 <button class="btn btn-sm btn-light" onclick="pottyDog(${dog.id})">Take Out</button>
-                <button class="btn btn-sm btn-warning" onclick="toggleStay(${dog.id})">Send Home</button>` 
-                : `<button class="btn btn-sm btn-success" onclick="toggleStay(${dog.id})">Re-Check In</button>`}
+                <button class="btn btn-sm btn-warning" onclick="toggleStay(${dog.id})">Send Home</button>`:
+                `<button class="btn btn-sm btn-success" onclick="toggleStay(${dog.id})">Re-Check In</button>`}
             </div>
         `;
-        if (dog.staying) stayingDiv.appendChild(card);
+        if(dog.staying) stayingDiv.appendChild(card);
         else notStayingDiv.appendChild(card);
         allDogsDiv.appendChild(card.cloneNode(true));
     });
 }
 
-// Listen to Firebase updates in real-time
-db.ref('dogs').on('value', snapshot => {
-    dogs = snapshot.val() || {};
-    render();
-});
-</script>
+function renderLogs() {
+    const logsDiv=document.getElementById('logs');
+    logsDiv.innerHTML='';
+    db.ref('Logs').orderByChild('timestamp').once('value', snapshot=>{
+        const logs = snapshot.val();
+        if(!logs) return;
+        const sortedLogs = Object.values(logs).sort((a,b)=>b.timestamp - a.timestamp);
+        sortedLogs.forEach(log=>{
+            const logCard=document.createElement('div');
+            logCard.className='dog-card status-grey mb-2';
+            logCard.innerHTML=`
+                <strong>${log.dogName} (${log.ownerName})</strong> 
+                ${log.action==='arrived'?'arrived':'sent home'} at ${new Date(log.timestamp).toLocaleString()}<br>
+                Total Dogs Now: ${log.totalDogsAfterAction}
+            `;
+            logsDiv.appendChild(logCard);
+        });
+    });
+}
 
+// Firebase real-time listeners
+db.ref('dogs').on('value', snap=>{dogs=snap.val()||{}; render(); renderLogs();});
+db.ref('Logs').on('value', renderLogs);
+</script>
 </body>
 </html>
