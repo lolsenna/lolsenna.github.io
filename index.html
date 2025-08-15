@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dog Daycare Manager - Live Firebase</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    body { background-color: #121212; color: #e0e0e0; }
+    .dog-card { border-radius: 10px; padding: 15px; color: white; transition: 0.3s; }
+    .status-grey { background-color: #444; }
+    .status-purple { background-color: #6a0dad; }
+    .status-blue { background-color: #007bff; }
+    .status-green { background-color: #28a745; }
+    .dog-actions button { margin-right: 5px; }
+</style>
+</head>
+<body class="p-3">
+
+<div class="container">
+    <h1 class="text-center mb-4">🐾 Dog Daycare Manager (Live)</h1>
+
+    <!-- Controls -->
+    <div class="d-flex flex-wrap mb-3 gap-2">
+        <input type="text" id="searchInput" class="form-control w-auto" placeholder="Search dogs...">
+        <select id="sortSelect" class="form-select w-auto">
+            <option value="name">Sort by Name</option>
+            <option value="age">Sort by Age</option>
+        </select>
+        <button class="btn btn-success" onclick="showAddDogModal()">Add Dog</button>
+        <button class="btn btn-danger" onclick="resetAllStatus()">Reset All Status</button>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" id="dogTabs">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#staying">Currently Staying</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#notStaying">Not Staying</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#allDogs">All Dogs</button></li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="staying"></div>
+        <div class="tab-pane fade" id="notStaying"></div>
+        <div class="tab-pane fade" id="allDogs"></div>
+    </div>
+</div>
+
+<!-- Add Dog Modal -->
+<div class="modal fade" id="addDogModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Dog</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="dogName" class="form-control mb-2" placeholder="Dog's Name">
+        <input type="number" id="dogAge" class="form-control mb-2" placeholder="Dog's Age">
+        <input type="text" id="ownerName" class="form-control mb-2" placeholder="Owner's Name">
+        <select id="dogSex" class="form-select mb-2">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="addDog()">Add Dog</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBucpC5LlqzyQfn2fLfqxSoKRe9Zl8kmyU",
+  authDomain: "webdemo-49504.firebaseapp.com",
+  databaseURL: "https://webdemo-49504-default-rtdb.firebaseio.com",
+  projectId: "webdemo-49504",
+  storageBucket: "webdemo-49504.firebasestorage.app",
+  messagingSenderId: "332904713754",
+  appId: "1:332904713754:web:85c455b1e769050ef20ba3",
+  measurementId: "G-45XJ8K2NNB"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const THREE_HOURS = 3 * 60 * 60 * 1000;
+const addDogModal = new bootstrap.Modal(document.getElementById('addDogModal'));
+let dogs = {};
+
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('sortSelect').addEventListener('change', render);
+
+function showAddDogModal() { addDogModal.show(); }
+
+function addDog() {
+    const name = document.getElementById('dogName').value.trim();
+    const age = parseInt(document.getElementById('dogAge').value);
+    const owner = document.getElementById('ownerName').value.trim();
+    const sex = document.getElementById('dogSex').value;
+    if (!name || !age || !owner) return alert('Please fill in all fields');
+
+    const id = Date.now();
+    db.ref('dogs/' + id).set({ id, name, age, owner, sex, staying: true, lastFed: null, lastPotty: null });
+    addDogModal.hide();
+}
+
+function toggleStay(id) {
+    const dog = dogs[id];
+    db.ref('dogs/' + id).update({ staying: !dog.staying, lastFed: null, lastPotty: null });
+}
+
+function feedDog(id) {
+    const dog = dogs[id];
+    const newVal = (dog.lastFed && Date.now() - dog.lastFed <= THREE_HOURS) ? null : Date.now();
+    db.ref('dogs/' + id).update({ lastFed: newVal });
+}
+
+function pottyDog(id) {
+    const dog = dogs[id];
+    const newVal = (dog.lastPotty && Date.now() - dog.lastPotty <= THREE_HOURS) ? null : Date.now();
+    db.ref('dogs/' + id).update({ lastPotty: newVal });
+}
+
+function resetAllStatus() {
+    Object.values(dogs).forEach(dog => {
+        if (dog.staying) db.ref('dogs/' + dog.id).update({ lastFed: null, lastPotty: null });
+    });
+}
+
+function getStatusClass(dog) {
+    const now = Date.now();
+    const fedRecent = dog.lastFed && now - dog.lastFed <= THREE_HOURS;
+    const pottyRecent = dog.lastPotty && now - dog.lastPotty <= THREE_HOURS;
+
+    if (fedRecent && pottyRecent) return 'status-green';
+    if (fedRecent) return 'status-purple';
+    if (pottyRecent) return 'status-blue';
+    return 'status-grey';
+}
+
+function render() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const sort = document.getElementById('sortSelect').value;
+    const stayingDiv = document.getElementById('staying');
+    const notStayingDiv = document.getElementById('notStaying');
+    const allDogsDiv = document.getElementById('allDogs');
+
+    const dogArray = Object.values(dogs)
+        .filter(d => d.name.toLowerCase().includes(search) || d.owner.toLowerCase().includes(search))
+        .sort((a,b) => sort==='name'? a.name.localeCompare(b.name) : a.age - b.age);
+
+    stayingDiv.innerHTML = '';
+    notStayingDiv.innerHTML = '';
+    allDogsDiv.innerHTML = '';
+
+    dogArray.forEach(dog => {
+        const card = document.createElement('div');
+        card.className = `dog-card mb-3 ${getStatusClass(dog)}`;
+        card.innerHTML = `
+            <h5>${dog.name} (${dog.age} yrs, ${dog.sex})</h5>
+            <p>Owner: ${dog.owner}</p>
+            <p>Last Fed: ${dog.lastFed ? new Date(dog.lastFed).toLocaleTimeString() : 'Not yet'}</p>
+            <p>Last Potty: ${dog.lastPotty ? new Date(dog.lastPotty).toLocaleTimeString() : 'Not yet'}</p>
+            <div class="dog-actions">
+                ${dog.staying ? `
+                <button class="btn btn-sm btn-light" onclick="feedDog(${dog.id})">Feed</button>
+                <button class="btn btn-sm btn-light" onclick="pottyDog(${dog.id})">Take Out</button>
+                <button class="btn btn-sm btn-warning" onclick="toggleStay(${dog.id})">Send Home</button>` 
+                : `<button class="btn btn-sm btn-success" onclick="toggleStay(${dog.id})">Re-Check In</button>`}
+            </div>
+        `;
+        if (dog.staying) stayingDiv.appendChild(card);
+        else notStayingDiv.appendChild(card);
+        allDogsDiv.appendChild(card.cloneNode(true));
+    });
+}
+
+// Listen to Firebase updates in real-time
+db.ref('dogs').on('value', snapshot => {
+    dogs = snapshot.val() || {};
+    render();
+});
+</script>
+
+</body>
+</html>
