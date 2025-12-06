@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Pay with Google Sign-In</title>
+    <title>Apple Pay with Credits System</title>
     <style>
         * {
             margin: 0;
@@ -202,6 +202,91 @@
             background: #e8eaed;
         }
 
+        .credits-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .credits-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .credits-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .credits-subtext {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .action-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .action-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .use-credit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .use-credit-btn:hover:not(:disabled) {
+            background: #218838;
+        }
+
+        .use-credit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .refresh-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: #f8f9fa;
+        }
+
         .product {
             border: 1px solid #e0e0e0;
             border-radius: 12px;
@@ -240,10 +325,29 @@
             font-weight: 700;
         }
 
+        .product-bonus {
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
         .status {
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .status.success {
@@ -252,10 +356,22 @@
             border: 1px solid #c3e6cb;
         }
 
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         .status.info {
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
 
         .info-box {
@@ -275,21 +391,38 @@
             margin-bottom: 8px;
         }
 
-        .purchase-history-btn {
-            width: 100%;
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
         }
 
-        .purchase-history-btn:hover {
-            background: #218838;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .transaction-history {
+            margin-top: 20px;
+        }
+
+        .history-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .history-item {
+            padding: 10px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -298,7 +431,7 @@
         <!-- Login Screen -->
         <div id="login-screen">
             <h1>Welcome</h1>
-            <p class="subtitle">Sign in to purchase and access your products</p>
+            <p class="subtitle">Sign in to manage your credits</p>
             
             <button id="google-signin-btn" class="google-btn">
                 <svg class="google-icon" viewBox="0 0 24 24">
@@ -325,15 +458,18 @@
             <button id="email-login-btn" class="auth-btn">Continue with Email</button>
 
             <div class="info-box">
-                <strong>🔒 Secure Sign-In</strong>
-                Sign in with Google for the best experience, or simply use your email. Your purchase will be linked to your account.
+                <strong>🎯 How Credits Work</strong>
+                • Purchase credits to use premium features<br>
+                • Each purchase gives you 10 credits<br>
+                • Use 1 credit per action<br>
+                • Track your usage in real-time
             </div>
         </div>
 
         <!-- Main App Screen -->
         <div id="app-screen">
-            <h1>Premium Widget</h1>
-            <p class="subtitle">Exclusive digital product</p>
+            <h1>Premium Features</h1>
+            <p class="subtitle">Manage your credits and access premium tools</p>
 
             <div class="user-info">
                 <img id="user-avatar-img" class="user-avatar" style="display:none;" src="" alt="User">
@@ -345,13 +481,33 @@
                 <button id="logout-btn" class="logout-btn">Logout</button>
             </div>
 
-            <div id="payment-status"></div>
+            <!-- Credits Display -->
+            <div class="credits-card">
+                <div class="credits-label">Available Credits</div>
+                <div class="credits-number" id="credits-display">-</div>
+                <div class="credits-subtext" id="credits-subtext">Loading...</div>
+            </div>
 
+            <div id="status-message"></div>
+
+            <!-- Use Credit Section -->
+            <div class="action-section">
+                <div class="action-title">🚀 Use Premium Feature</div>
+                <button id="use-credit-btn" class="use-credit-btn">
+                    <span>Use 1 Credit</span>
+                </button>
+                <button id="refresh-credits-btn" class="refresh-btn">
+                    🔄 Refresh Credits
+                </button>
+            </div>
+
+            <!-- Purchase More -->
             <div class="product">
-                <div class="product-image">📱</div>
+                <div class="product-image">💳</div>
                 <div class="product-details">
-                    <div class="product-name">Premium Widget</div>
+                    <div class="product-name">Credit Pack</div>
                     <div class="product-price">$29.99</div>
+                    <div class="product-bonus">+10 Credits</div>
                 </div>
             </div>
 
@@ -365,12 +521,12 @@
             </div>
 
             <div class="info-box">
-                <strong>How it works:</strong>
-                1. Your email is automatically linked to your purchase<br>
-                2. After payment, you'll get instant access<br>
-                3. Check your purchase history anytime in Stripe<br><br>
-                <strong>Test Card:</strong> 4242 4242 4242 4242<br><br>
-                <strong>Note:</strong> This uses Stripe directly - no backend needed! Stripe keeps track of all your purchases.
+                <strong>💡 Quick Tips</strong>
+                • Credits are added automatically after purchase<br>
+                • Use the refresh button to update your balance<br>
+                • Each credit unlocks one premium action<br>
+                • Purchase more credits anytime<br><br>
+                <strong>Test Card:</strong> 4242 4242 4242 4242
             </div>
         </div>
     </div>
@@ -379,12 +535,13 @@
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <script>
         let currentUser = null;
+        const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
 
         // Initialize Google Sign-In
         function initGoogle() {
             if (typeof google !== 'undefined') {
                 google.accounts.id.initialize({
-                    client_id: '861221266040-kg9rasjk464jo4opiukc7m23pokbhn9k.apps.googleusercontent.com',
+                    client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
                     callback: handleGoogleSignIn
                 });
             }
@@ -434,7 +591,6 @@
                 showAppScreen();
             });
 
-            // Allow Enter key
             document.getElementById('email-input').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     document.getElementById('email-login-btn').click();
@@ -448,13 +604,13 @@
                 if (typeof google !== 'undefined') {
                     google.accounts.id.prompt();
                 } else {
-                    alert('⚠️ Google Sign-In Setup:\n\n1. Get Client ID from console.cloud.google.com\n2. Replace YOUR_GOOGLE_CLIENT_ID in code\n3. Add https://lolsenna.github.io to authorized origins\n\nFor now, use "Continue with Email" below!');
+                    alert('⚠️ Google Sign-In not configured. Use "Continue with Email" instead!');
                 }
             }
         });
 
         // Show app screen after login
-        function showAppScreen() {
+        async function showAppScreen() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
             
@@ -475,20 +631,101 @@
                 const buyButton = document.getElementById('stripe-buy-btn');
                 if (buyButton) {
                     buyButton.setAttribute('customer-email', currentUser.email);
-                    
-                    const statusDiv = document.getElementById('payment-status');
-                    statusDiv.innerHTML = `
-                        <div class="status info">
-                            ℹ️ Ready to purchase! Your email <strong>${currentUser.email}</strong> will be linked to your payment.<br><br>
-                            After purchase, Stripe will track your payment history automatically.
-                        </div>
-                    `;
                 }
             }, 500);
+
+            // Load credits
+            await loadCredits();
         }
 
-        // Logout
+        // Load credits from database
+        async function loadCredits() {
+            try {
+                document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
+                document.getElementById('credits-subtext').textContent = 'Loading...';
+                
+                const response = await fetch(`${WORKER_URL}/get-credits`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUser.email })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('credits-display').textContent = data.credits || 0;
+                
+                if (data.credits > 0) {
+                    document.getElementById('credits-subtext').textContent = `${data.totalPurchases || 0} total purchases`;
+                    document.getElementById('use-credit-btn').disabled = false;
+                } else {
+                    document.getElementById('credits-subtext').textContent = 'Purchase credits to get started';
+                    document.getElementById('use-credit-btn').disabled = true;
+                }
+            } catch (error) {
+                console.error('Error loading credits:', error);
+                document.getElementById('credits-display').textContent = '?';
+                document.getElementById('credits-subtext').textContent = 'Error loading credits';
+                showStatus('Error loading credits: ' + error.message, 'error');
+            }
+        }
+
+        // Use a credit
+        async function useCredit() {
+            const btn = document.getElementById('use-credit-btn');
+            const originalHTML = btn.innerHTML;
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loading"></div> <span>Processing...</span>';
+                
+                const response = await fetch(`${WORKER_URL}/use-credit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUser.email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus(`✅ Success! You have ${data.credits} credits remaining.`, 'success');
+                    document.getElementById('credits-display').textContent = data.credits;
+                    
+                    if (data.credits === 0) {
+                        document.getElementById('credits-subtext').textContent = 'No credits remaining - Purchase more below';
+                        btn.disabled = true;
+                    }
+                } else {
+                    showStatus('⚠️ ' + data.message, 'warning');
+                    btn.disabled = true;
+                }
+            } catch (error) {
+                console.error('Error using credit:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+            } finally {
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Event listeners
         document.addEventListener('click', function(e) {
+            if (e.target.id === 'use-credit-btn' || e.target.closest('#use-credit-btn')) {
+                useCredit();
+            }
+            
+            if (e.target.id === 'refresh-credits-btn') {
+                loadCredits();
+            }
+            
             if (e.target.id === 'logout-btn') {
                 currentUser = null;
                 document.getElementById('app-screen').style.display = 'none';
@@ -497,7 +734,16 @@
             }
         });
 
-        // Initialize when ready
+        // Check for payment success (from Stripe redirect)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true' && currentUser) {
+            setTimeout(() => {
+                loadCredits();
+                showStatus('🎉 Payment successful! Your credits have been added.', 'success');
+            }, 1000);
+        }
+
+        // Initialize
         window.onload = initGoogle;
     </script>
 </body>
