@@ -357,8 +357,23 @@
             document.getElementById('user-avatar').textContent = currentUser.avatar;
 
             // Pass user email to Stripe buy button
-            const buyButton = document.getElementById('stripe-buy-btn');
-            buyButton.setAttribute('customer-email', currentUser.email);
+            // Wait for buy button to be ready
+            setTimeout(() => {
+                const buyButton = document.getElementById('stripe-buy-btn');
+                if (buyButton) {
+                    buyButton.setAttribute('customer-email', currentUser.email);
+                    console.log('Set Stripe buy button email to:', currentUser.email);
+                    
+                    // Show reminder
+                    const statusDiv = document.getElementById('payment-status');
+                    statusDiv.innerHTML = `
+                        <div class="status info">
+                            ℹ️ <strong>Important:</strong> When you checkout, make sure the email is: <strong>${currentUser.email}</strong><br>
+                            This ensures we can link your purchase to your account.
+                        </div>
+                    `;
+                }
+            }, 500);
         }
 
         // Check payment status
@@ -384,7 +399,7 @@
                 }
                 
                 const data = await response.json();
-                console.log('Response data:', data);
+                console.log('Full response data:', JSON.stringify(data, null, 2));
                 
                 if (data.error) {
                     statusDiv.innerHTML = `
@@ -400,16 +415,29 @@
                         <div class="status success">
                             ✅ <strong>Payment Verified!</strong><br>
                             You have ${data.paymentCount} successful payment(s).<br>
+                            Customer ID: ${data.customer ? data.customer.id : 'N/A'}<br>
                             You have access to Premium Widget!
                         </div>
                     `;
                 } else {
-                    statusDiv.innerHTML = `
+                    // Show detailed debug info
+                    let debugInfo = `
                         <div class="status warning">
-                            ℹ️ No purchase found for ${currentUser.email}.<br>
-                            Purchase below to get access!
-                        </div>
+                            ℹ️ No purchase found for <strong>${currentUser.email}</strong><br><br>
+                            <strong>Debug Info:</strong><br>
+                            Searching for: ${currentUser.email}<br>
                     `;
+                    
+                    if (data.customer) {
+                        debugInfo += `Customer found: ${data.customer.email}<br>`;
+                    } else {
+                        debugInfo += `No customer found in Stripe with this email<br>`;
+                    }
+                    
+                    debugInfo += `<br><strong>💡 Tip:</strong> Make sure the email you enter at checkout matches: ${currentUser.email}`;
+                    debugInfo += `</div>`;
+                    
+                    statusDiv.innerHTML = debugInfo;
                 }
             } catch (error) {
                 console.error('Error details:', error);
