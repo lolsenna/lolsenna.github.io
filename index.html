@@ -596,6 +596,81 @@
             }
         }
 
+        // Login function - creates session on server
+        async function login(email, name, picture, source) {
+            try {
+                const response = await fetch(`${WORKER_URL}/login`, {
+                    method: 'POST',
+                    credentials: 'include', // Important for cookies
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, name, picture, source })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    showAppScreen();
+                    return true;
+                } else {
+                    showStatus('❌ Login failed: ' + (data.error || 'Unknown error'), 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showStatus('❌ Login failed: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // Verify existing session on page load
+        async function verifyExistingSession() {
+            try {
+                const response = await fetch(`${WORKER_URL}/verify-session`, {
+                    method: 'GET',
+                    credentials: 'include' // Important for cookies
+                });
+
+                const data = await response.json();
+
+                if (data.valid && data.email) {
+                    // Session is valid, load user data
+                    currentUser = {
+                        email: data.email,
+                        name: data.email.split('@')[0],
+                        picture: null,
+                        source: 'session'
+                    };
+                    showAppScreen();
+                    showStatus('👋 Welcome back!', 'info');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Session verification error:', error);
+                return false;
+            }
+        }
+
+        // Logout function - clears session on server
+        async function logout() {
+            try {
+                await fetch(`${WORKER_URL}/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                currentUser = null;
+                document.getElementById('app-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'block';
+                document.getElementById('email-input').value = '';
+                showStatus('👋 Logged out successfully', 'info');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showStatus('❌ Logout failed: ' + error.message, 'error');
+            }
+        }
+
         // Handle Google Sign-In
         async function handleGoogleSignIn(response) {
             const userInfo = parseJwt(response.credential);
