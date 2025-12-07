@@ -637,12 +637,12 @@
                     // Session is valid, load user data
                     currentUser = {
                         email: data.email,
-                        name: data.email.split('@')[0],
-                        picture: null,
+                        name: data.name || data.email.split('@')[0],
+                        picture: data.picture || null,
                         source: 'session'
                     };
-                    showAppScreen();
-                    showStatus('👋 Welcome back!', 'info');
+                    await showAppScreen();
+                    setTimeout(() => showStatus('👋 Welcome back!', 'info'), 500);
                     return true;
                 }
                 return false;
