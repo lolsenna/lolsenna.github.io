@@ -599,6 +599,8 @@
         // Login function - creates session on server
         async function login(email, name, picture, source) {
             try {
+                console.log('Attempting login for:', email);
+                
                 const response = await fetch(`${WORKER_URL}/login`, {
                     method: 'POST',
                     credentials: 'include', // Important for cookies
@@ -606,11 +608,19 @@
                     body: JSON.stringify({ email, name, picture, source })
                 });
 
+                console.log('Login response status:', response.status);
                 const data = await response.json();
+                console.log('Login response data:', data);
 
-                if (data.success) {
-                    currentUser = data.user;
-                    showAppScreen();
+                if (data.success && data.user) {
+                    currentUser = {
+                        email: data.user.email,
+                        name: data.user.name || email.split('@')[0],
+                        picture: data.user.picture || picture,
+                        source: data.user.source || source
+                    };
+                    console.log('CurrentUser set to:', currentUser);
+                    await showAppScreen();
                     return true;
                 } else {
                     showStatus('❌ Login failed: ' + (data.error || 'Unknown error'), 'error');
