@@ -769,14 +769,23 @@
 
         // Load credits from database
         async function loadCredits() {
+            const token = getSessionToken();
+            if (!token) {
+                showStatus('⚠️ Session expired. Please log in again.', 'warning');
+                logout();
+                return;
+            }
+
             try {
                 document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
                 document.getElementById('credits-subtext').textContent = 'Loading...';
                 
                 const response = await fetch(`${WORKER_URL}/get-credits`, {
                     method: 'POST',
-                    credentials: 'include', // Important for cookies
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 
                 if (response.status === 401) {
@@ -807,6 +816,13 @@
 
         // Use a credit
         async function useCredit() {
+            const token = getSessionToken();
+            if (!token) {
+                showStatus('⚠️ Session expired. Please log in again.', 'warning');
+                logout();
+                return;
+            }
+
             const btn = document.getElementById('use-credit-btn');
             const originalHTML = btn.innerHTML;
             
@@ -816,8 +832,10 @@
                 
                 const response = await fetch(`${WORKER_URL}/use-credit`, {
                     method: 'POST',
-                    credentials: 'include', // Important for cookies
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
                 
                 if (response.status === 401) {
