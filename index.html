@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,12 +62,12 @@
             color: #3c4043;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
 
         .google-btn:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             border-color: #c6c6c6;
         }
 
@@ -344,6 +345,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -395,14 +397,16 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 3px solid rgba(255,255,255,.3);
+            border: 3px solid rgba(255, 255, 255, .3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .transaction-history {
@@ -426,19 +430,24 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Login Screen -->
         <div id="login-screen">
             <h1>Welcome</h1>
             <p class="subtitle">Sign in to manage your credits</p>
-            
+
             <button id="google-signin-btn" class="google-btn">
                 <svg class="google-icon" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    <path fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
                 Sign in with Google
             </button>
@@ -447,12 +456,7 @@
 
             <div class="input-group">
                 <label for="email-input">Email Address</label>
-                <input 
-                    type="email" 
-                    id="email-input" 
-                    placeholder="you@example.com"
-                    required
-                >
+                <input type="email" id="email-input" placeholder="you@example.com" required>
             </div>
 
             <button id="email-login-btn" class="auth-btn">Continue with Email</button>
@@ -512,11 +516,8 @@
             </div>
 
             <div style="margin: 20px 0;">
-                <stripe-buy-button
-                    id="stripe-buy-btn"
-                    buy-button-id="buy_btn_1S7RnGDF77uOmLWrBAqZ5nZx"
-                    publishable-key="pk_test_51S7RP5DF77uOmLWrIkGD9Uk0luxxdnXdFzCJ491TMXoqoiCoQEBqfb6gsLjfChi9Yi7FeMibyG73xELAAhA2qWXc00GZiOoMlt"
-                >
+                <stripe-buy-button id="stripe-buy-btn" buy-button-id="buy_btn_1S7RnGDF77uOmLWrBAqZ5nZx"
+                    publishable-key="pk_test_51S7RP5DF77uOmLWrIkGD9Uk0luxxdnXdFzCJ491TMXoqoiCoQEBqfb6gsLjfChi9Yi7FeMibyG73xELAAhA2qWXc00GZiOoMlt">
                 </stripe-buy-button>
             </div>
 
@@ -547,18 +548,33 @@
             }
         }
 
-        // Handle Google Sign-In
-        function handleGoogleSignIn(response) {
-            const userInfo = parseJwt(response.credential);
-            
-            currentUser = {
-                email: userInfo.email,
-                name: userInfo.name,
-                picture: userInfo.picture,
-                source: 'google'
-            };
+        // Handle Google Sign-In: parse JWT locally and then ask worker to create a session
+        async function handleGoogleSignIn(response) {
+            try {
+                const userInfo = parseJwt(response.credential);
 
-            showAppScreen();
+                // Create session via worker
+                const res = await fetch(`${WORKER_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include', // important - allow cookies
+                    body: JSON.stringify({ email: userInfo.email })
+                });
+
+                if (!res.ok) throw new Error('Login failed');
+
+                currentUser = {
+                    email: userInfo.email,
+                    name: userInfo.name,
+                    picture: userInfo.picture,
+                    source: 'google'
+                };
+
+                await showAppScreen();
+            } catch (err) {
+                console.error('Google login failed', err);
+                alert('Google login failed: ' + (err.message || err));
+            }
         }
 
         // Parse JWT token
@@ -571,52 +587,58 @@
             return JSON.parse(jsonPayload);
         }
 
-        // Email login
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('email-login-btn').addEventListener('click', function() {
+        // Email login: send to worker to create session
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('email-login-btn').addEventListener('click', async function () {
                 const email = document.getElementById('email-input').value.trim();
-                
+
                 if (!email || !email.includes('@')) {
                     alert('Please enter a valid email address');
                     return;
                 }
-                
-                currentUser = {
-                    email: email,
-                    name: email.split('@')[0],
-                    picture: null,
-                    source: 'email'
-                };
-                
-                showAppScreen();
+
+                try {
+                    const res = await fetch(`${WORKER_URL}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ email })
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok || !data.success) {
+                        throw new Error(data.message || 'Login failed');
+                    }
+
+                    currentUser = {
+                        email,
+                        name: email.split('@')[0],
+                        picture: null,
+                        source: 'email'
+                    };
+
+                    await showAppScreen();
+                } catch (err) {
+                    console.error('Email login failed', err);
+                    alert('Login failed: ' + (err.message || err));
+                }
             });
 
-            document.getElementById('email-input').addEventListener('keypress', function(e) {
+            document.getElementById('email-input').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     document.getElementById('email-login-btn').click();
                 }
             });
         });
 
-        // Google Sign-In button click
-        document.addEventListener('click', function(e) {
-            if (e.target.id === 'google-signin-btn' || e.target.closest('#google-signin-btn')) {
-                if (typeof google !== 'undefined') {
-                    google.accounts.id.prompt();
-                } else {
-                    alert('⚠️ Google Sign-In not configured. Use "Continue with Email" instead!');
-                }
-            }
-        });
-
         // Show app screen after login
         async function showAppScreen() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
-            
+
             document.getElementById('user-name').textContent = currentUser.name;
             document.getElementById('user-email').textContent = currentUser.email;
-            
+
             if (currentUser.picture) {
                 const img = document.getElementById('user-avatar-img');
                 img.src = currentUser.picture;
@@ -638,22 +660,28 @@
             await loadCredits();
         }
 
-        // Load credits from database
+        // Load credits from /get-credits (cookie-based)
         async function loadCredits() {
             try {
                 document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
                 document.getElementById('credits-subtext').textContent = 'Loading...';
-                
+
                 const response = await fetch(`${WORKER_URL}/get-credits`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: { 'Accept': 'application/json' }
                 });
-                
+
+                if (response.status === 401) {
+                    // session invalid
+                    handleLoggedOutState();
+                    return;
+                }
+
                 const data = await response.json();
-                
+
                 document.getElementById('credits-display').textContent = data.credits || 0;
-                
+
                 if (data.credits > 0) {
                     document.getElementById('credits-subtext').textContent = `${data.totalPurchases || 0} total purchases`;
                     document.getElementById('use-credit-btn').disabled = false;
@@ -665,7 +693,7 @@
                 console.error('Error loading credits:', error);
                 document.getElementById('credits-display').textContent = '?';
                 document.getElementById('credits-subtext').textContent = 'Error loading credits';
-                showStatus('Error loading credits: ' + error.message, 'error');
+                showStatus('Error loading credits: ' + (error.message || error), 'error');
             }
         }
 
@@ -673,78 +701,116 @@
         async function useCredit() {
             const btn = document.getElementById('use-credit-btn');
             const originalHTML = btn.innerHTML;
-            
+
             try {
                 btn.disabled = true;
                 btn.innerHTML = '<div class="loading"></div> <span>Processing...</span>';
-                
+
                 const response = await fetch(`${WORKER_URL}/use-credit`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                
+
+                if (response.status === 401) {
+                    handleLoggedOutState();
+                    return;
+                }
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showStatus(`✅ Success! You have ${data.credits} credits remaining.`, 'success');
                     document.getElementById('credits-display').textContent = data.credits;
-                    
+
                     if (data.credits === 0) {
                         document.getElementById('credits-subtext').textContent = 'No credits remaining - Purchase more below';
                         btn.disabled = true;
                     }
                 } else {
-                    showStatus('⚠️ ' + data.message, 'warning');
+                    showStatus('⚠️ ' + (data.message || 'Unable to use credit'), 'warning');
                     btn.disabled = true;
                 }
             } catch (error) {
                 console.error('Error using credit:', error);
-                showStatus('❌ Error: ' + error.message, 'error');
+                showStatus('❌ Error: ' + (error.message || error), 'error');
             } finally {
                 btn.innerHTML = originalHTML;
             }
         }
 
-        // Show status message
+        // Show status message helper
         function showStatus(message, type) {
             const statusDiv = document.getElementById('status-message');
             statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
-            
+
             setTimeout(() => {
                 statusDiv.innerHTML = '';
             }, 5000);
         }
 
+        // Handle logged out state
+        function handleLoggedOutState() {
+            currentUser = null;
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('email-input').value = '';
+            showStatus('You have been logged out. Please sign in again.', 'info');
+        }
+
         // Event listeners
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.id === 'use-credit-btn' || e.target.closest('#use-credit-btn')) {
                 useCredit();
             }
-            
+
             if (e.target.id === 'refresh-credits-btn') {
                 loadCredits();
             }
-            
+
             if (e.target.id === 'logout-btn') {
-                currentUser = null;
-                document.getElementById('app-screen').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('email-input').value = '';
+                fetch(`${WORKER_URL}/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                }).then(() => {
+                    handleLoggedOutState();
+                }).catch(err => {
+                    console.error('Logout failed', err);
+                    handleLoggedOutState();
+                });
             }
         });
 
-        // Check for payment success (from Stripe redirect)
+        // Check for payment success (from Stripe redirect) and refresh credits
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true' && currentUser) {
-            setTimeout(() => {
-                loadCredits();
-                showStatus('🎉 Payment successful! Your credits have been added.', 'success');
-            }, 1000);
-        }
+        window.addEventListener('load', async () => {
+            // If user already has a session we can fetch /me to populate currentUser for page reload UX
+            try {
+                const meRes = await fetch(`${WORKER_URL}/me`, { method: 'GET', credentials: 'include' });
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    if (meData.authenticated) {
+                        currentUser = { email: meData.email, name: meData.email.split('@')[0], picture: null };
+                        await showAppScreen();
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not get /me', err);
+            }
+
+            if (urlParams.get('success') === 'true' && currentUser) {
+                setTimeout(() => {
+                    loadCredits();
+                    showStatus('🎉 Payment successful! Your credits have been added.', 'success');
+                }, 1000);
+            }
+        });
 
         // Initialize
         window.onload = initGoogle;
     </script>
+
 </body>
+
 </html>
