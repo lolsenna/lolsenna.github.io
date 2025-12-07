@@ -533,24 +533,37 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-    <script>
-        let currentUser = null;
-        const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
+<script>
+    let currentUser = null;
+    const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
 
-        // Initialize Google Sign-In
-        function initGoogle() {
-            if (typeof google !== 'undefined') {
-                google.accounts.id.initialize({
-                    client_id: '861221266040-kg9rasjk464jo4opiukc7m23pokbhn9k.apps.googleusercontent.com',
-                    callback: handleGoogleSignIn
-                });
-            }
+    // Initialize Google Sign-In
+    function initGoogle() {
+        if (typeof google !== 'undefined') {
+            google.accounts.id.initialize({
+                client_id: '861221266040-kg9rasjk464jo4opiukc7m23pokbhn9k.apps.googleusercontent.com',
+                callback: handleGoogleSignIn
+            });
         }
+    }
 
-        // Handle Google Sign-In
-        function handleGoogleSignIn(response) {
+    // Handle Google Sign-In: parse JWT locally and then ask worker to create a session
+    async function handleGoogleSignIn(response) {
+        try {
             const userInfo = parseJwt(response.credential);
-            
+
+            // Create session via worker
+            const res = await fetch(`${WORKER_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // important - allow cookies
+                body: JSON.stringify({ email: userInfo.email })
+            });
+
+            if (!res.ok) throw new Error('Login failed');
+
             currentUser = {
                 email: userInfo.email,
                 name: userInfo.name,
@@ -558,193 +571,246 @@
                 source: 'google'
             };
 
-            showAppScreen();
+            await showAppScreen();
+        } catch (err) {
+            console.error('Google login failed', err);
+            alert('Google login failed: ' + (err.message || err));
         }
+    }
 
-        // Parse JWT token
-        function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        }
+    // Parse JWT token
+    function parseJwt(token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    }
 
-        // Email login
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('email-login-btn').addEventListener('click', function() {
-                const email = document.getElementById('email-input').value.trim();
-                
-                if (!email || !email.includes('@')) {
-                    alert('Please enter a valid email address');
-                    return;
+    // Email login: send to worker to create session
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('email-login-btn').addEventListener('click', async function() {
+            const email = document.getElementById('email-input').value.trim();
+
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${WORKER_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'Login failed');
                 }
-                
+
                 currentUser = {
-                    email: email,
+                    email,
                     name: email.split('@')[0],
                     picture: null,
                     source: 'email'
                 };
-                
-                showAppScreen();
-            });
 
-            document.getElementById('email-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('email-login-btn').click();
-                }
-            });
-        });
-
-        // Google Sign-In button click
-        document.addEventListener('click', function(e) {
-            if (e.target.id === 'google-signin-btn' || e.target.closest('#google-signin-btn')) {
-                if (typeof google !== 'undefined') {
-                    google.accounts.id.prompt();
-                } else {
-                    alert('⚠️ Google Sign-In not configured. Use "Continue with Email" instead!');
-                }
+                await showAppScreen();
+            } catch (err) {
+                console.error('Email login failed', err);
+                alert('Login failed: ' + (err.message || err));
             }
         });
 
-        // Show app screen after login
-        async function showAppScreen() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'block';
-            
-            document.getElementById('user-name').textContent = currentUser.name;
-            document.getElementById('user-email').textContent = currentUser.email;
-            
-            if (currentUser.picture) {
-                const img = document.getElementById('user-avatar-img');
-                img.src = currentUser.picture;
-                img.style.display = 'block';
-                document.getElementById('user-avatar-fallback').style.display = 'none';
+        document.getElementById('email-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('email-login-btn').click();
+            }
+        });
+    });
+
+    // Show app screen after login
+    async function showAppScreen() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+
+        document.getElementById('user-name').textContent = currentUser.name;
+        document.getElementById('user-email').textContent = currentUser.email;
+
+        if (currentUser.picture) {
+            const img = document.getElementById('user-avatar-img');
+            img.src = currentUser.picture;
+            img.style.display = 'block';
+            document.getElementById('user-avatar-fallback').style.display = 'none';
+        } else {
+            document.getElementById('user-avatar-fallback').textContent = currentUser.email.charAt(0).toUpperCase();
+        }
+
+        // Set email in Stripe buy button
+        setTimeout(() => {
+            const buyButton = document.getElementById('stripe-buy-btn');
+            if (buyButton) {
+                buyButton.setAttribute('customer-email', currentUser.email);
+            }
+        }, 500);
+
+        // Load credits
+        await loadCredits();
+    }
+
+    // Load credits from /get-credits (cookie-based)
+    async function loadCredits() {
+        try {
+            document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
+            document.getElementById('credits-subtext').textContent = 'Loading...';
+
+            const response = await fetch(`${WORKER_URL}/get-credits`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.status === 401) {
+                // session invalid
+                handleLoggedOutState();
+                return;
+            }
+
+            const data = await response.json();
+
+            document.getElementById('credits-display').textContent = data.credits || 0;
+
+            if (data.credits > 0) {
+                document.getElementById('credits-subtext').textContent = `${data.totalPurchases || 0} total purchases`;
+                document.getElementById('use-credit-btn').disabled = false;
             } else {
-                document.getElementById('user-avatar-fallback').textContent = currentUser.email.charAt(0).toUpperCase();
+                document.getElementById('credits-subtext').textContent = 'Purchase credits to get started';
+                document.getElementById('use-credit-btn').disabled = true;
+            }
+        } catch (error) {
+            console.error('Error loading credits:', error);
+            document.getElementById('credits-display').textContent = '?';
+            document.getElementById('credits-subtext').textContent = 'Error loading credits';
+            showStatus('Error loading credits: ' + (error.message || error), 'error');
+        }
+    }
+
+    // Use a credit
+    async function useCredit() {
+        const btn = document.getElementById('use-credit-btn');
+        const originalHTML = btn.innerHTML;
+
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading"></div> <span>Processing...</span>';
+
+            const response = await fetch(`${WORKER_URL}/use-credit`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.status === 401) {
+                handleLoggedOutState();
+                return;
             }
 
-            // Set email in Stripe buy button
-            setTimeout(() => {
-                const buyButton = document.getElementById('stripe-buy-btn');
-                if (buyButton) {
-                    buyButton.setAttribute('customer-email', currentUser.email);
-                }
-            }, 500);
+            const data = await response.json();
 
-            // Load credits
-            await loadCredits();
-        }
+            if (data.success) {
+                showStatus(`✅ Success! You have ${data.credits} credits remaining.`, 'success');
+                document.getElementById('credits-display').textContent = data.credits;
 
-        // Load credits from database
-        async function loadCredits() {
-            try {
-                document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
-                document.getElementById('credits-subtext').textContent = 'Loading...';
-                
-                const response = await fetch(`${WORKER_URL}/get-credits`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
-                });
-                
-                const data = await response.json();
-                
-                document.getElementById('credits-display').textContent = data.credits || 0;
-                
-                if (data.credits > 0) {
-                    document.getElementById('credits-subtext').textContent = `${data.totalPurchases || 0} total purchases`;
-                    document.getElementById('use-credit-btn').disabled = false;
-                } else {
-                    document.getElementById('credits-subtext').textContent = 'Purchase credits to get started';
-                    document.getElementById('use-credit-btn').disabled = true;
-                }
-            } catch (error) {
-                console.error('Error loading credits:', error);
-                document.getElementById('credits-display').textContent = '?';
-                document.getElementById('credits-subtext').textContent = 'Error loading credits';
-                showStatus('Error loading credits: ' + error.message, 'error');
-            }
-        }
-
-        // Use a credit
-        async function useCredit() {
-            const btn = document.getElementById('use-credit-btn');
-            const originalHTML = btn.innerHTML;
-            
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loading"></div> <span>Processing...</span>';
-                
-                const response = await fetch(`${WORKER_URL}/use-credit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showStatus(`✅ Success! You have ${data.credits} credits remaining.`, 'success');
-                    document.getElementById('credits-display').textContent = data.credits;
-                    
-                    if (data.credits === 0) {
-                        document.getElementById('credits-subtext').textContent = 'No credits remaining - Purchase more below';
-                        btn.disabled = true;
-                    }
-                } else {
-                    showStatus('⚠️ ' + data.message, 'warning');
+                if (data.credits === 0) {
+                    document.getElementById('credits-subtext').textContent = 'No credits remaining - Purchase more below';
                     btn.disabled = true;
                 }
-            } catch (error) {
-                console.error('Error using credit:', error);
-                showStatus('❌ Error: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = originalHTML;
+            } else {
+                showStatus('⚠️ ' + (data.message || 'Unable to use credit'), 'warning');
+                btn.disabled = true;
             }
+        } catch (error) {
+            console.error('Error using credit:', error);
+            showStatus('❌ Error: ' + (error.message || error), 'error');
+        } finally {
+            btn.innerHTML = originalHTML;
+        }
+    }
+
+    // Show status message helper
+    function showStatus(message, type) {
+        const statusDiv = document.getElementById('status-message');
+        statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+
+        setTimeout(() => {
+            statusDiv.innerHTML = '';
+        }, 5000);
+    }
+
+    // Handle logged out state
+    function handleLoggedOutState() {
+        currentUser = null;
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'block';
+        document.getElementById('email-input').value = '';
+        showStatus('You have been logged out. Please sign in again.', 'info');
+    }
+
+    // Event listeners
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'use-credit-btn' || e.target.closest('#use-credit-btn')) {
+            useCredit();
         }
 
-        // Show status message
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('status-message');
-            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
-            
-            setTimeout(() => {
-                statusDiv.innerHTML = '';
-            }, 5000);
+        if (e.target.id === 'refresh-credits-btn') {
+            loadCredits();
         }
 
-        // Event listeners
-        document.addEventListener('click', function(e) {
-            if (e.target.id === 'use-credit-btn' || e.target.closest('#use-credit-btn')) {
-                useCredit();
-            }
-            
-            if (e.target.id === 'refresh-credits-btn') {
-                loadCredits();
-            }
-            
-            if (e.target.id === 'logout-btn') {
-                currentUser = null;
-                document.getElementById('app-screen').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('email-input').value = '';
-            }
-        });
+        if (e.target.id === 'logout-btn') {
+            fetch(`${WORKER_URL}/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(() => {
+                handleLoggedOutState();
+            }).catch(err => {
+                console.error('Logout failed', err);
+                handleLoggedOutState();
+            });
+        }
+    });
 
-        // Check for payment success (from Stripe redirect)
-        const urlParams = new URLSearchParams(window.location.search);
+    // Check for payment success (from Stripe redirect) and refresh credits
+    const urlParams = new URLSearchParams(window.location.search);
+    window.addEventListener('load', async () => {
+        // If user already has a session we can fetch /me to populate currentUser for page reload UX
+        try {
+            const meRes = await fetch(`${WORKER_URL}/me`, { method: 'GET', credentials: 'include' });
+            if (meRes.ok) {
+                const meData = await meRes.json();
+                if (meData.authenticated) {
+                    currentUser = { email: meData.email, name: meData.email.split('@')[0], picture: null };
+                    await showAppScreen();
+                }
+            }
+        } catch (err) {
+            console.warn('Could not get /me', err);
+        }
+
         if (urlParams.get('success') === 'true' && currentUser) {
             setTimeout(() => {
                 loadCredits();
                 showStatus('🎉 Payment successful! Your credits have been added.', 'success');
             }, 1000);
         }
+    });
 
-        // Initialize
-        window.onload = initGoogle;
-    </script>
+    // Initialize
+    window.onload = initGoogle;
+</script>
+
 </body>
 </html>
