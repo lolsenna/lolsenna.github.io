@@ -536,29 +536,76 @@
     <script>
         let currentUser = null;
         const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
+        const SESSION_KEY = 'user_session';
+        const SESSION_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+        // Save session to localStorage
+        function saveSession(user) {
+            const session = {
+                user: user,
+                timestamp: Date.now(),
+                expiresAt: Date.now() + SESSION_EXPIRY
+            };
+            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
+
+        // Load session from localStorage
+        function loadSession() {
+            try {
+                const sessionData = localStorage.getItem(SESSION_KEY);
+                if (!sessionData) return null;
+
+                const session = JSON.parse(sessionData);
+                
+                // Check if session is expired
+                if (Date.now() > session.expiresAt) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return null;
+                }
+
+                return session.user;
+            } catch (error) {
+                console.error('Error loading session:', error);
+                localStorage.removeItem(SESSION_KEY);
+                return null;
+            }
+        }
+
+        // Clear session
+        function clearSession() {
+            localStorage.removeItem(SESSION_KEY);
+        }
+
+        // Check for existing session on page load
+        function checkExistingSession() {
+            const savedUser = loadSession();
+            if (savedUser) {
+                currentUser = savedUser;
+                showAppScreen();
+                showStatus('👋 Welcome back, ' + savedUser.name + '!', 'info');
+            }
+        }
 
         // Initialize Google Sign-In
         function initGoogle() {
             if (typeof google !== 'undefined') {
                 google.accounts.id.initialize({
-                    client_id: '861221266040-kg9rasjk464jo4opiukc7m23pokbhn9k.apps.googleusercontent.com',
+                    client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
                     callback: handleGoogleSignIn
                 });
             }
         }
 
         // Handle Google Sign-In
-        function handleGoogleSignIn(response) {
+        async function handleGoogleSignIn(response) {
             const userInfo = parseJwt(response.credential);
             
-            currentUser = {
-                email: userInfo.email,
-                name: userInfo.name,
-                picture: userInfo.picture,
-                source: 'google'
-            };
-
-            showAppScreen();
+            await login(
+                userInfo.email,
+                userInfo.name,
+                userInfo.picture,
+                'google'
+            );
         }
 
         // Parse JWT token
@@ -572,8 +619,11 @@
         }
 
         // Email login
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('email-login-btn').addEventListener('click', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check for existing session first
+            await verifyExistingSession();
+
+            document.getElementById('email-login-btn').addEventListener('click', async function() {
                 const email = document.getElementById('email-input').value.trim();
                 
                 if (!email || !email.includes('@')) {
@@ -581,14 +631,8 @@
                     return;
                 }
                 
-                currentUser = {
-                    email: email,
-                    name: email.split('@')[0],
-                    picture: null,
-                    source: 'email'
-                };
-                
-                showAppScreen();
+                const name = email.split('@')[0];
+                await login(email, name, null, 'email');
             });
 
             document.getElementById('email-input').addEventListener('keypress', function(e) {
@@ -646,9 +690,16 @@
                 
                 const response = await fetch(`${WORKER_URL}/get-credits`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
+                    credentials: 'include', // Important for cookies
+                    headers: { 'Content-Type': 'application/json' }
                 });
+                
+                if (response.status === 401) {
+                    // Session expired, go back to login
+                    showStatus('⚠️ Session expired. Please log in again.', 'warning');
+                    logout();
+                    return;
+                }
                 
                 const data = await response.json();
                 
@@ -680,9 +731,15 @@
                 
                 const response = await fetch(`${WORKER_URL}/use-credit`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
+                    credentials: 'include', // Important for cookies
+                    headers: { 'Content-Type': 'application/json' }
                 });
+                
+                if (response.status === 401) {
+                    showStatus('⚠️ Session expired. Please log in again.', 'warning');
+                    logout();
+                    return;
+                }
                 
                 const data = await response.json();
                 
@@ -727,10 +784,7 @@
             }
             
             if (e.target.id === 'logout-btn') {
-                currentUser = null;
-                document.getElementById('app-screen').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('email-input').value = '';
+                logout();
             }
         });
 
