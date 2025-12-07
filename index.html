@@ -506,7 +506,7 @@
                 <div class="product-image">💳</div>
                 <div class="product-details">
                     <div class="product-name">Credit Pack</div>
-                    <div class="product-price">$29.99</div>
+                    <div class="product-price">$1.00</div>
                     <div class="product-bonus">+10 Credits</div>
                 </div>
             </div>
@@ -536,55 +536,6 @@
     <script>
         let currentUser = null;
         const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
-        const SESSION_KEY = 'user_session';
-        const SESSION_EXPIRY = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
-
-        // Save session to localStorage
-        function saveSession(user) {
-            const session = {
-                user: user,
-                timestamp: Date.now(),
-                expiresAt: Date.now() + SESSION_EXPIRY
-            };
-            localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-        }
-
-        // Load session from localStorage
-        function loadSession() {
-            try {
-                const sessionData = localStorage.getItem(SESSION_KEY);
-                if (!sessionData) return null;
-
-                const session = JSON.parse(sessionData);
-                
-                // Check if session is expired
-                if (Date.now() > session.expiresAt) {
-                    localStorage.removeItem(SESSION_KEY);
-                    return null;
-                }
-
-                return session.user;
-            } catch (error) {
-                console.error('Error loading session:', error);
-                localStorage.removeItem(SESSION_KEY);
-                return null;
-            }
-        }
-
-        // Clear session
-        function clearSession() {
-            localStorage.removeItem(SESSION_KEY);
-        }
-
-        // Check for existing session on page load
-        function checkExistingSession() {
-            const savedUser = loadSession();
-            if (savedUser) {
-                currentUser = savedUser;
-                showAppScreen();
-                showStatus('👋 Welcome back, ' + savedUser.name + '!', 'info');
-            }
-        }
 
         // Initialize Google Sign-In
         function initGoogle() {
@@ -596,101 +547,18 @@
             }
         }
 
-        // Login function - creates session on server
-        async function login(email, name, picture, source) {
-            try {
-                console.log('Attempting login for:', email);
-                
-                const response = await fetch(`${WORKER_URL}/login`, {
-                    method: 'POST',
-                    credentials: 'include', // Important for cookies
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, name, picture, source })
-                });
-
-                console.log('Login response status:', response.status);
-                const data = await response.json();
-                console.log('Login response data:', data);
-
-                if (data.success && data.user) {
-                    currentUser = {
-                        email: data.user.email,
-                        name: data.user.name || email.split('@')[0],
-                        picture: data.user.picture || picture,
-                        source: data.user.source || source
-                    };
-                    console.log('CurrentUser set to:', currentUser);
-                    await showAppScreen();
-                    return true;
-                } else {
-                    showStatus('❌ Login failed: ' + (data.error || 'Unknown error'), 'error');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showStatus('❌ Login failed: ' + error.message, 'error');
-                return false;
-            }
-        }
-
-        // Verify existing session on page load
-        async function verifyExistingSession() {
-            try {
-                const response = await fetch(`${WORKER_URL}/verify-session`, {
-                    method: 'GET',
-                    credentials: 'include' // Important for cookies
-                });
-
-                const data = await response.json();
-
-                if (data.valid && data.email) {
-                    // Session is valid, load user data
-                    currentUser = {
-                        email: data.email,
-                        name: data.name || data.email.split('@')[0],
-                        picture: data.picture || null,
-                        source: 'session'
-                    };
-                    await showAppScreen();
-                    setTimeout(() => showStatus('👋 Welcome back!', 'info'), 500);
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error('Session verification error:', error);
-                return false;
-            }
-        }
-
-        // Logout function - clears session on server
-        async function logout() {
-            try {
-                await fetch(`${WORKER_URL}/logout`, {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-
-                currentUser = null;
-                document.getElementById('app-screen').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('email-input').value = '';
-                showStatus('👋 Logged out successfully', 'info');
-            } catch (error) {
-                console.error('Logout error:', error);
-                showStatus('❌ Logout failed: ' + error.message, 'error');
-            }
-        }
-
         // Handle Google Sign-In
-        async function handleGoogleSignIn(response) {
+        function handleGoogleSignIn(response) {
             const userInfo = parseJwt(response.credential);
             
-            await login(
-                userInfo.email,
-                userInfo.name,
-                userInfo.picture,
-                'google'
-            );
+            currentUser = {
+                email: userInfo.email,
+                name: userInfo.name,
+                picture: userInfo.picture,
+                source: 'google'
+            };
+
+            showAppScreen();
         }
 
         // Parse JWT token
@@ -704,11 +572,8 @@
         }
 
         // Email login
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Check for existing session first
-            await verifyExistingSession();
-
-            document.getElementById('email-login-btn').addEventListener('click', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email-login-btn').addEventListener('click', function() {
                 const email = document.getElementById('email-input').value.trim();
                 
                 if (!email || !email.includes('@')) {
@@ -716,8 +581,14 @@
                     return;
                 }
                 
-                const name = email.split('@')[0];
-                await login(email, name, null, 'email');
+                currentUser = {
+                    email: email,
+                    name: email.split('@')[0],
+                    picture: null,
+                    source: 'email'
+                };
+                
+                showAppScreen();
             });
 
             document.getElementById('email-input').addEventListener('keypress', function(e) {
@@ -769,31 +640,15 @@
 
         // Load credits from database
         async function loadCredits() {
-            const token = getSessionToken();
-            if (!token) {
-                showStatus('⚠️ Session expired. Please log in again.', 'warning');
-                logout();
-                return;
-            }
-
             try {
                 document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
                 document.getElementById('credits-subtext').textContent = 'Loading...';
                 
                 const response = await fetch(`${WORKER_URL}/get-credits`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUser.email })
                 });
-                
-                if (response.status === 401) {
-                    // Session expired, go back to login
-                    showStatus('⚠️ Session expired. Please log in again.', 'warning');
-                    logout();
-                    return;
-                }
                 
                 const data = await response.json();
                 
@@ -816,13 +671,6 @@
 
         // Use a credit
         async function useCredit() {
-            const token = getSessionToken();
-            if (!token) {
-                showStatus('⚠️ Session expired. Please log in again.', 'warning');
-                logout();
-                return;
-            }
-
             const btn = document.getElementById('use-credit-btn');
             const originalHTML = btn.innerHTML;
             
@@ -832,17 +680,9 @@
                 
                 const response = await fetch(`${WORKER_URL}/use-credit`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentUser.email })
                 });
-                
-                if (response.status === 401) {
-                    showStatus('⚠️ Session expired. Please log in again.', 'warning');
-                    logout();
-                    return;
-                }
                 
                 const data = await response.json();
                 
@@ -887,7 +727,10 @@
             }
             
             if (e.target.id === 'logout-btn') {
-                logout();
+                currentUser = null;
+                document.getElementById('app-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'block';
+                document.getElementById('email-input').value = '';
             }
         });
 
