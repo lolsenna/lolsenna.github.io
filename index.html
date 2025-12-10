@@ -22,6 +22,36 @@
             padding: 20px;
         }
 
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: #5568d3;
+        }
+
+        .nav-btn.secondary {
+            background: #f1f3f4;
+            color: #666;
+        }
+
+        .nav-btn.secondary:hover {
+            background: #e8eaed;
+        }
+
         .container {
             background: white;
             border-radius: 20px;
@@ -484,7 +514,7 @@
                 </div>
                 <button id="logout-btn" class="logout-btn">Logout</button>
             </div>
-
+            <a href="profile.html" class="nav-btn">👤 My Profile</a>
             <!-- Credits Display -->
             <div class="credits-card">
                 <div class="credits-label">Available Credits</div>
