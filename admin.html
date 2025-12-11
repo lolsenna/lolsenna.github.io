@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .users-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .search-box {
+            padding: 10px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 300px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .users-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .users-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #ffd700;
+            color: #856404;
+        }
+
+        .role-user {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .credits-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .detail-section {
+            margin-bottom: 30px;
+        }
+
+        .detail-section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .documents-list {
+            list-style: none;
+        }
+
+        .document-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .document-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .download-btn:hover {
+            background: #5568d3;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .transactions-table th {
+            text-align: left;
+            padding: 10px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .transactions-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .transaction-purchase {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .transaction-usage {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .unauthorized {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .unauthorized h1 {
+            font-size: 48px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .unauthorized p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>🛡️ Admin Panel</h1>
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-btn">← Back to App</a>
+                <button id="logout-btn" class="nav-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="unauthorized-screen" style="display: none;">
+            <div class="unauthorized">
+                <h1>🚫 Access Denied</h1>
+                <p>You do not have administrator privileges.</p>
+                <a href="index.html" class="nav-btn">Return to Home</a>
+            </div>
+        </div>
+
+        <div id="admin-content" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="total-users">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Credits</div>
+                    <div class="stat-value" id="total-credits">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Purchases</div>
+                    <div class="stat-value" id="total-purchases">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Administrators</div>
+                    <div class="stat-value" id="total-admins">0</div>
+                </div>
+            </div>
+
+            <div class="users-section">
+                <div class="section-header">
+                    <h2 class="section-title">All Users</h2>
+                    <input type="text" id="search-input" class="search-box" placeholder="Search users...">
+                </div>
+
+                <div id="loading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading users...</p>
+                </div>
+
+                <div id="error-message" style="display: none;"></div>
+
+                <table class="users-table" id="users-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Billing Name</th>
+                            <th>Role</th>
+                            <th>Credits</th>
+                            <th>Purchases</th>
+                            <th>Last Purchase</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-user-email"></h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <h3>Account Information</h3>
+                    <div class="detail-grid" id="account-info"></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Profile Information</h3>
+                    <div id="profile-info"></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Documents</h3>
+                    <div id="documents-list"></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Transaction History</h3>
+                    <div id="transactions-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAdmin = null;
+        let allUsers = [];
+        const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
+
+        // Load user from storage
+        function loadUserFromStorage() {
+            const userData = localStorage.getItem('appUser');
+            return userData ? JSON.parse(userData) : null;
+        }
+
+        // Check admin status
+        async function checkAdminStatus() {
+            const user = loadUserFromStorage();
+
+            if (!user) {
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            currentAdmin = user;
+
+            try {
+                const response = await fetch(`${WORKER_URL}/check-admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user.email })
+                });
+
+                const data = await response.json();
+
+                if (data.isAdmin) {
+                    document.getElementById('admin-content').style.display = 'block';
+                    loadUsers();
+                    return true;
+                } else {
+                    document.getElementById('unauthorized-screen').style.display = 'block';
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                document.getElementById('unauthorized-screen').style.display = 'block';
+                return false;
+            }
+        }
+
+        // Load all users
+        async function loadUsers() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('users-table').style.display = 'none';
+
+                const response = await fetch(`${WORKER_URL}/admin/get-users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: currentAdmin.email })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load users');
+                }
+
+                allUsers = await response.json();
+
+                // Calculate stats
+                const totalCredits = allUsers.reduce((sum, u) => sum + (u.credits || 0), 0);
+                const totalPurchases = allUsers.reduce((sum, u) => sum + (u.total_purchases || 0), 0);
+                const totalAdmins = allUsers.filter(u => u.role === 1).length;
+
+                document.getElementById('total-users').textContent = allUsers.length;
+                document.getElementById('total-credits').textContent = totalCredits;
+                document.getElementById('total-purchases').textContent = totalPurchases;
+                document.getElementById('total-admins').textContent = totalAdmins;
+
+                displayUsers(allUsers);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('users-table').style.display = 'table';
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('loading').style.display = 'none';
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Display users in table
+        function displayUsers(users) {
+            const tbody = document.getElementById('users-tbody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => viewUserDetails(user.email);
+
+                const roleClass = user.role === 1 ? 'role-admin' : 'role-user';
+                const roleText = user.role === 1 ? 'Admin' : 'User';
+
+                tr.innerHTML = `
+                    <td>${user.email}</td>
+                    <td>${user.billing_name || '-'}</td>
+                    <td><span class="role-badge ${roleClass}">${roleText}</span></td>
+                    <td><span class="credits-badge">${user.credits}</span></td>
+                    <td>${user.total_purchases || 0}</td>
+                    <td>${user.last_purchase_date ? new Date(user.last_purchase_date).toLocaleDateString() : '-'}</td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Search users
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('search-input').addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = allUsers.filter(user =>
+                    user.email.toLowerCase().includes(searchTerm) ||
+                    (user.billing_name && user.billing_name.toLowerCase().includes(searchTerm))
+                );
+                displayUsers(filtered);
+            });
+        });
+
+        // View user details
+        async function viewUserDetails(userEmail) {
+            try {
+                document.getElementById('modal-user-email').textContent = userEmail;
+                document.getElementById('user-modal').classList.add('active');
+
+                // Show loading
+                document.getElementById('account-info').innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+
+                const response = await fetch(`${WORKER_URL}/admin/get-user-details`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        adminEmail: currentAdmin.email,
+                        userEmail: userEmail
+                    })
+                });
+
+                const data = await response.json();
+
+                // Account info
+                const accountHtml = `
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${data.user.email}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Billing Name</div>
+                        <div class="detail-value">${data.user.billing_name || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Credits</div>
+                        <div class="detail-value">${data.user.credits}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Purchases</div>
+                        <div class="detail-value">${data.user.total_purchases || 0}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Role</div>
+                        <div class="detail-value">${data.user.role === 1 ? 'Administrator' : 'User'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Last Purchase</div>
+                        <div class="detail-value">${data.user.last_purchase_date ? new Date(data.user.last_purchase_date).toLocaleDateString() : '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Joined</div>
+                        <div class="detail-value">${new Date(data.user.created_at).toLocaleDateString()}</div>
+                    </div>
+                `;
+                document.getElementById('account-info').innerHTML = accountHtml;
+
+                // Profile info
+                if (data.profile) {
+                    const profileHtml = `
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Full Name</div>
+                                <div class="detail-value">${data.profile.full_name || '-'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Phone</div>
+                                <div class="detail-value">${data.profile.phone || '-'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Address</div>
+                                <div class="detail-value">${data.profile.address || '-'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">City</div>
+                                <div class="detail-value">${data.profile.city || '-'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">State</div>
+                                <div class="detail-value">${data.profile.state || '-'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Zip Code</div>
+                                <div class="detail-value">${data.profile.zip_code || '-'}</div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('profile-info').innerHTML = profileHtml;
+                } else {
+                    document.getElementById('profile-info').innerHTML = '<div class="no-data">No profile information</div>';
+                }
+
+                // Documents
+                if (data.documents.length > 0) {
+                    const docsHtml = `
+                        <ul class="documents-list">
+                            ${data.documents.map(doc => `
+                                <li class="document-item">
+                                    <div class="document-info">
+                                        <div class="document-name">📄 ${doc.document_name}</div>
+                                        <div class="document-meta">
+                                            ${(doc.file_size / 1024).toFixed(1)} KB • 
+                                            Uploaded ${new Date(doc.uploaded_at).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                    <button class="download-btn" onclick="downloadDocument('${doc.r2_key}')">
+                                        Download
+                                    </button>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    document.getElementById('documents-list').innerHTML = docsHtml;
+                } else {
+                    document.getElementById('documents-list').innerHTML = '<div class="no-data">No documents uploaded</div>';
+                }
+
+                // Transactions
+                if (data.transactions.length > 0) {
+                    const transHtml = `
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.transactions.map(t => `
+                                    <tr>
+                                        <td>${new Date(t.created_at).toLocaleDateString()}</td>
+                                        <td>${t.type}</td>
+                                        <td class="${t.type === 'purchase' ? 'transaction-purchase' : 'transaction-usage'}">
+                                            ${t.amount > 0 ? '+' : ''}${t.amount}
+                                        </td>
+                                        <td>${t.description}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    document.getElementById('transactions-list').innerHTML = transHtml;
+                } else {
+                    document.getElementById('transactions-list').innerHTML = '<div class="no-data">No transactions</div>';
+                }
+
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                alert('Error loading user details: ' + error.message);
+                closeModal();
+            }
+        }
+
+        // Download document
+        async function downloadDocument(r2Key) {
+            try {
+                const response = await fetch(`${WORKER_URL}/download-document`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ r2Key })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to download document');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = r2Key.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error downloading document:', error);
+                alert('Error downloading document: ' + error.message);
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('user-modal').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        document.getElementById('user-modal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function () {
+            localStorage.removeItem('appUser');
+            window.location.href = 'index.html';
+        });
+
+        // Initialize
+        window.onload = function () {
+            checkAdminStatus();
+        };
+    </script>
+</body>
+
+</html>
