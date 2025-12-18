@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Pay with Credits System</title>
+    <title>Credits Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -45,111 +45,7 @@
             font-size: 16px;
         }
 
-        /* Login Screen */
-        #login-screen .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            width: 100%;
-            padding: 14px 24px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #3c4043;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-        }
-
-        #login-screen .google-btn:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .google-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .divider {
-            text-align: center;
-            margin: 30px 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e0e0e0;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 20px;
-            position: relative;
-            color: #999;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .auth-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        /* App Screen */
-        #app-screen {
-            display: none;
-        }
-
+        /* User Card */
         .user-card {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 16px;
@@ -228,6 +124,7 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
+        /* Navigation Buttons */
         .nav-buttons {
             display: flex;
             gap: 10px;
@@ -515,11 +412,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Stripe Button Styling */
-        stripe-buy-button {
-            width: 100%;
-        }
-
         /* Responsive */
         @media (max-width: 640px) {
             .container {
@@ -543,135 +435,88 @@
 
 <body>
     <div class="container">
-        <!-- Login Screen -->
-        <div id="login-screen">
-            <div class="header">
-                <h1>Welcome Back</h1>
-                <p class="subtitle">Sign in to manage your credits</p>
+        <div class="header">
+            <h1>Premium Features</h1>
+            <p class="subtitle">Manage your credits and access premium tools</p>
+        </div>
+
+        <!-- User Card -->
+        <div class="user-card">
+            <img id="user-avatar-img" class="user-avatar" style="display:none;" src="" alt="User">
+            <div id="user-avatar-fallback" class="user-avatar-fallback"></div>
+            <div class="user-info">
+                <div id="user-name" class="user-name"></div>
+                <div id="user-email" class="user-email"></div>
             </div>
-
-            <button id="google-signin-btn" class="google-btn">
-                <svg class="google-icon" viewBox="0 0 24 24">
-                    <path fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                    <path fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Sign in with Google
-            </button>
-
-            <div class="divider"><span>or</span></div>
-
-            <div class="input-group">
-                <label for="email-input">Email Address</label>
-                <input type="email" id="email-input" placeholder="you@example.com" required>
-            </div>
-
-            <button id="email-login-btn" class="auth-btn">Continue with Email</button>
-
-            <div class="info-box">
-                <strong>🎯 How Credits Work</strong>
-                • Purchase credits to use premium features<br>
-                • Each purchase gives you 10 credits<br>
-                • Use 1 credit per action<br>
-                • Track your usage in real-time
+            <div class="user-actions">
+                <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
             </div>
         </div>
 
-        <!-- Main App Screen -->
-        <div id="app-screen">
-            <div class="header">
-                <h1>Premium Features</h1>
-                <p class="subtitle">Manage your credits and access premium tools</p>
-            </div>
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <a href="profile.html" class="nav-btn">
+                👤 My Profile
+            </a>
+            <a href="admin.html" id="admin-link" class="nav-btn admin" style="display: none;">
+                🛡️ Admin Panel
+            </a>
+        </div>
 
-            <!-- User Card -->
-            <div class="user-card">
-                <img id="user-avatar-img" class="user-avatar" style="display:none;" src="" alt="User">
-                <div id="user-avatar-fallback" class="user-avatar-fallback"></div>
-                <div class="user-info">
-                    <div id="user-name" class="user-name"></div>
-                    <div id="user-email" class="user-email"></div>
-                </div>
-                <div class="user-actions">
-                    <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
-                </div>
+        <!-- Credits Display -->
+        <div class="credits-card">
+            <div class="credits-content">
+                <div class="credits-label">Available Credits</div>
+                <div class="credits-number" id="credits-display">-</div>
+                <div class="credits-subtext" id="credits-subtext">Loading...</div>
             </div>
+        </div>
 
-            <!-- Navigation Buttons -->
-            <div class="nav-buttons">
-                <a href="profile.html" class="nav-btn">
-                    👤 My Profile
-                </a>
-                <a href="admin.html" id="admin-link" class="nav-btn admin" style="display: none;">
-                    🛡️ Admin Panel
-                </a>
+        <div id="status-message"></div>
+
+        <!-- Use Credit Section -->
+        <div class="action-section">
+            <div class="action-title">🚀 Use Premium Feature</div>
+            <button id="use-credit-btn" class="use-credit-btn">
+                <span>Use 1 Credit</span>
+            </button>
+            <button id="refresh-credits-btn" class="refresh-btn">
+                🔄 Refresh Credits
+            </button>
+        </div>
+
+        <!-- Purchase More -->
+        <div class="product">
+            <div class="product-image">💳</div>
+            <div class="product-details">
+                <div class="product-name">Credit Pack</div>
+                <div class="product-price">$1.00</div>
+                <div class="product-bonus">+10 Credits</div>
             </div>
+        </div>
 
-            <!-- Credits Display -->
-            <div class="credits-card">
-                <div class="credits-content">
-                    <div class="credits-label">Available Credits</div>
-                    <div class="credits-number" id="credits-display">-</div>
-                    <div class="credits-subtext" id="credits-subtext">Loading...</div>
-                </div>
-            </div>
+        <div style="margin: 20px 0;">
+            <stripe-buy-button id="stripe-buy-btn" buy-button-id="buy_btn_1S7RnGDF77uOmLWrBAqZ5nZx"
+                publishable-key="pk_test_51S7RP5DF77uOmLWrIkGD9Uk0luxxdnXdFzCJ491TMXoqoiCoQEBqfb6gsLjfChi9Yi7FeMibyG73xELAAhA2qWXc00GZiOoMlt">
+            </stripe-buy-button>
+        </div>
 
-            <div id="status-message"></div>
-
-            <!-- Use Credit Section -->
-            <div class="action-section">
-                <div class="action-title">🚀 Use Premium Feature</div>
-                <button id="use-credit-btn" class="use-credit-btn">
-                    <span>Use 1 Credit</span>
-                </button>
-                <button id="refresh-credits-btn" class="refresh-btn">
-                    🔄 Refresh Credits
-                </button>
-            </div>
-
-            <!-- Purchase More -->
-            <div class="product">
-                <div class="product-image">💳</div>
-                <div class="product-details">
-                    <div class="product-name">Credit Pack</div>
-                    <div class="product-price">$1.00</div>
-                    <div class="product-bonus">+10 Credits</div>
-                </div>
-            </div>
-
-            <div style="margin: 20px 0;">
-                <stripe-buy-button id="stripe-buy-btn" buy-button-id="buy_btn_1S7RnGDF77uOmLWrBAqZ5nZx"
-                    publishable-key="pk_test_51S7RP5DF77uOmLWrIkGD9Uk0luxxdnXdFzCJ491TMXoqoiCoQEBqfb6gsLjfChi9Yi7FeMibyG73xELAAhA2qWXc00GZiOoMlt">
-                </stripe-buy-button>
-            </div>
-
-            <div class="info-box">
-                <strong>💡 Quick Tips</strong>
-                • Credits are added automatically after purchase<br>
-                • Use the refresh button to update your balance<br>
-                • Each credit unlocks one premium action<br>
-                • Purchase more credits anytime<br><br>
-                <strong>Test Card:</strong> 4242 4242 4242 4242
-            </div>
+        <div class="info-box">
+            <strong>💡 Quick Tips</strong>
+            • Credits are added automatically after purchase<br>
+            • Use the refresh button to update your balance<br>
+            • Each credit unlocks one premium action<br>
+            • Purchase more credits anytime<br><br>
+            <strong>Test Card:</strong> 4242 4242 4242 4242
         </div>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <script>
         let currentUser = null;
         const WORKER_URL = 'https://long-night-afa7.pinterest-subdomain.workers.dev';
 
-        // Session storage functions
-        function saveUserToStorage(user) {
-            localStorage.setItem('appUser', JSON.stringify(user));
-        }
-
+        // Load user from storage
         function loadUserFromStorage() {
             const userData = localStorage.getItem('appUser');
             return userData ? JSON.parse(userData) : null;
@@ -699,84 +544,14 @@
             }
         }
 
-        // Initialize Google Sign-In
-        function initGoogle() {
-            if (typeof google !== 'undefined') {
-                google.accounts.id.initialize({
-                    client_id: '861221266040-kg9rasjk464jo4opiukc7m23pokbhn9k.apps.googleusercontent.com',
-                    callback: handleGoogleSignIn
-                });
+        // Initialize user display
+        async function initializeUser() {
+            currentUser = loadUserFromStorage();
+
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
             }
-        }
-
-        // Handle Google Sign-In
-        function handleGoogleSignIn(response) {
-            const userInfo = parseJwt(response.credential);
-
-            currentUser = {
-                email: userInfo.email,
-                name: userInfo.name,
-                picture: userInfo.picture,
-                source: 'google'
-            };
-
-            saveUserToStorage(currentUser);
-            showAppScreen();
-        }
-
-        // Parse JWT token
-        function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        }
-
-        // Email login
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('email-login-btn').addEventListener('click', function () {
-                const email = document.getElementById('email-input').value.trim();
-
-                if (!email || !email.includes('@')) {
-                    alert('Please enter a valid email address');
-                    return;
-                }
-
-                currentUser = {
-                    email: email,
-                    name: email.split('@')[0],
-                    picture: null,
-                    source: 'email'
-                };
-
-                saveUserToStorage(currentUser);
-                showAppScreen();
-            });
-
-            document.getElementById('email-input').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('email-login-btn').click();
-                }
-            });
-        });
-
-        // Google Sign-In button click
-        document.addEventListener('click', function (e) {
-            if (e.target.id === 'google-signin-btn' || e.target.closest('#google-signin-btn')) {
-                if (typeof google !== 'undefined') {
-                    google.accounts.id.prompt();
-                } else {
-                    alert('⚠️ Google Sign-In not configured. Use "Continue with Email" instead!');
-                }
-            }
-        });
-
-        // Show app screen after login
-        async function showAppScreen() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'block';
 
             document.getElementById('user-name').textContent = currentUser.name;
             document.getElementById('user-email').textContent = currentUser.email;
@@ -884,45 +659,25 @@
         }
 
         // Event listeners
-        document.addEventListener('click', function (e) {
-            if (e.target.id === 'use-credit-btn' || e.target.closest('#use-credit-btn')) {
-                useCredit();
-            }
+        document.getElementById('use-credit-btn').addEventListener('click', useCredit);
+        document.getElementById('refresh-credits-btn').addEventListener('click', loadCredits);
 
-            if (e.target.id === 'refresh-credits-btn') {
-                loadCredits();
-            }
-
-            if (e.target.id === 'logout-btn' || e.target.closest('#logout-btn')) {
-                clearUserFromStorage();
-                currentUser = null;
-                document.getElementById('app-screen').style.display = 'none';
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('email-input').value = '';
-                document.getElementById('admin-link').style.display = 'none';
-            }
+        document.getElementById('logout-btn').addEventListener('click', function () {
+            clearUserFromStorage();
+            window.location.href = 'login.html';
         });
 
         // Check for payment success (from Stripe redirect)
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true' && currentUser) {
+        if (urlParams.get('success') === 'true') {
             setTimeout(() => {
                 loadCredits();
                 showStatus('🎉 Payment successful! Your credits have been added.', 'success');
             }, 1000);
         }
 
-        // Initialize - Check for saved user on load
-        window.onload = function () {
-            initGoogle();
-
-            // Try to load saved user
-            const savedUser = loadUserFromStorage();
-            if (savedUser) {
-                currentUser = savedUser;
-                showAppScreen();
-            }
-        };
+        // Initialize on page load
+        window.onload = initializeUser;
     </script>
 </body>
 
