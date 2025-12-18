@@ -16,89 +16,58 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
 
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .nav-btn {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .nav-btn:hover {
-            background: #5568d3;
-        }
-
-        .nav-btn.secondary {
-            background: #f1f3f4;
-            color: #666;
-        }
-
-        .nav-btn.secondary:hover {
-            background: #e8eaed;
-        }
-
         .container {
+            max-width: 600px;
+            margin: 40px auto;
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 40px;
-            max-width: 500px;
-            width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         h1 {
             color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 700;
         }
 
         .subtitle {
             color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
+            font-size: 16px;
         }
 
-        #login-screen {
-            text-align: center;
-        }
-
-        .google-btn {
+        /* Login Screen */
+        #login-screen .google-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
             width: 100%;
-            padding: 12px 24px;
+            padding: 14px 24px;
             background: white;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             color: #3c4043;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
             margin-bottom: 20px;
         }
 
-        .google-btn:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            border-color: #c6c6c6;
+        #login-screen .google-btn:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
         }
 
         .google-icon {
@@ -108,7 +77,7 @@
 
         .divider {
             text-align: center;
-            margin: 20px 0;
+            margin: 30px 0;
             position: relative;
         }
 
@@ -124,10 +93,11 @@
 
         .divider span {
             background: white;
-            padding: 0 15px;
+            padding: 0 20px;
             position: relative;
             color: #999;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .input-group {
@@ -137,63 +107,71 @@
         .input-group label {
             display: block;
             color: #333;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
+            font-size: 14px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
             font-size: 16px;
+            transition: all 0.3s;
         }
 
         .input-group input:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
         .auth-btn {
             width: 100%;
-            padding: 14px;
-            background: #667eea;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
         }
 
         .auth-btn:hover {
-            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
+        /* App Screen */
         #app-screen {
             display: none;
         }
 
-        .user-info {
+        .user-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            gap: 16px;
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .user-avatar-fallback {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
@@ -201,17 +179,20 @@
             justify-content: center;
             color: white;
             font-size: 24px;
-            font-weight: bold;
+            font-weight: 700;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .user-details {
+        .user-info {
             flex: 1;
         }
 
         .user-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #333;
-            margin-bottom: 3px;
+            font-size: 18px;
+            margin-bottom: 4px;
         }
 
         .user-email {
@@ -219,73 +200,160 @@
             color: #666;
         }
 
-        .logout-btn {
-            padding: 6px 12px;
-            background: #f1f3f4;
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
+            background: white;
             color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .logout-btn:hover {
-            background: #e8eaed;
+        .icon-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 14px 20px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn.admin {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-color: #ffd700;
+            color: #856404;
+        }
+
+        .nav-btn.admin:hover {
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+            color: #856404;
+        }
+
+        /* Credits Card */
         .credits-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 20px;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
             color: white;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .credits-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(-25%, -25%); }
+            50% { transform: translate(0%, 0%); }
+        }
+
+        .credits-content {
+            position: relative;
+            z-index: 1;
         }
 
         .credits-label {
             font-size: 14px;
             opacity: 0.9;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
         }
 
         .credits-number {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1;
         }
 
         .credits-subtext {
-            font-size: 14px;
-            opacity: 0.8;
+            font-size: 15px;
+            opacity: 0.85;
         }
 
+        /* Action Section */
         .action-section {
             background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
 
         .action-title {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .use-credit-btn {
             width: 100%;
-            padding: 16px;
-            background: #28a745;
+            padding: 18px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -293,50 +361,62 @@
         }
 
         .use-credit-btn:hover:not(:disabled) {
-            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
         }
 
         .use-credit-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
+            transform: none;
         }
 
         .refresh-btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: white;
             color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
+            transition: all 0.3s;
         }
 
         .refresh-btn:hover {
+            border-color: #667eea;
             background: #f8f9fa;
         }
 
+        /* Product Card */
         .product {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
             display: flex;
             gap: 20px;
             align-items: center;
+            transition: all 0.3s;
+        }
+
+        .product:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
         }
 
         .product-image {
             width: 80px;
             height: 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 40px;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
         }
 
         .product-details {
@@ -344,30 +424,32 @@
         }
 
         .product-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #333;
-            margin-bottom: 5px;
-            font-size: 18px;
+            margin-bottom: 6px;
+            font-size: 20px;
         }
 
         .product-price {
-            font-size: 24px;
+            font-size: 28px;
             color: #667eea;
-            font-weight: 700;
+            font-weight: 800;
+            margin-bottom: 4px;
         }
 
         .product-bonus {
             font-size: 14px;
             color: #28a745;
-            font-weight: 600;
-            margin-top: 5px;
+            font-weight: 700;
         }
 
+        /* Status Messages */
         .status {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
             animation: slideIn 0.3s ease;
+            font-weight: 600;
         }
 
         @keyframes slideIn {
@@ -375,7 +457,6 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -385,78 +466,77 @@
         .status.success {
             background: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
+            border: 2px solid #c3e6cb;
         }
 
         .status.error {
             background: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
+            border: 2px solid #f5c6cb;
         }
 
         .status.warning {
             background: #fff3cd;
             color: #856404;
-            border: 1px solid #ffeaa7;
+            border: 2px solid #ffc107;
         }
 
+        /* Info Box */
         .info-box {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-left: 4px solid #667eea;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 4px;
+            padding: 20px;
+            margin-top: 24px;
+            border-radius: 12px;
             font-size: 14px;
             color: #666;
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         .info-box strong {
             color: #333;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            font-size: 15px;
         }
 
+        /* Loading Spinner */
         .loading {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border: 3px solid rgba(255, 255, 255, .3);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 0.8s ease-in-out infinite;
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
+            to { transform: rotate(360deg); }
+        }
+
+        /* Stripe Button Styling */
+        stripe-buy-button {
+            width: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 30px 24px;
             }
-        }
 
-        .transaction-history {
-            margin-top: 20px;
-        }
+            h1 {
+                font-size: 28px;
+            }
 
-        .history-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
+            .credits-number {
+                font-size: 48px;
+            }
 
-        .history-item {
-            padding: 10px;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 14px;
+            .nav-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -465,8 +545,10 @@
     <div class="container">
         <!-- Login Screen -->
         <div id="login-screen">
-            <h1>Welcome</h1>
-            <p class="subtitle">Sign in to manage your credits</p>
+            <div class="header">
+                <h1>Welcome Back</h1>
+                <p class="subtitle">Sign in to manage your credits</p>
+            </div>
 
             <button id="google-signin-btn" class="google-btn">
                 <svg class="google-icon" viewBox="0 0 24 24">
@@ -502,24 +584,41 @@
 
         <!-- Main App Screen -->
         <div id="app-screen">
-            <h1>Premium Features</h1>
-            <p class="subtitle">Manage your credits and access premium tools</p>
+            <div class="header">
+                <h1>Premium Features</h1>
+                <p class="subtitle">Manage your credits and access premium tools</p>
+            </div>
 
-            <div class="user-info">
+            <!-- User Card -->
+            <div class="user-card">
                 <img id="user-avatar-img" class="user-avatar" style="display:none;" src="" alt="User">
                 <div id="user-avatar-fallback" class="user-avatar-fallback"></div>
-                <div class="user-details">
+                <div class="user-info">
                     <div id="user-name" class="user-name"></div>
                     <div id="user-email" class="user-email"></div>
                 </div>
-                <button id="logout-btn" class="logout-btn">Logout</button>
+                <div class="user-actions">
+                    <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
+                </div>
             </div>
-            <a href="profile.html" class="nav-btn">👤 My Profile</a>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <a href="profile.html" class="nav-btn">
+                    👤 My Profile
+                </a>
+                <a href="admin.html" id="admin-link" class="nav-btn admin" style="display: none;">
+                    🛡️ Admin Panel
+                </a>
+            </div>
+
             <!-- Credits Display -->
             <div class="credits-card">
-                <div class="credits-label">Available Credits</div>
-                <div class="credits-number" id="credits-display">-</div>
-                <div class="credits-subtext" id="credits-subtext">Loading...</div>
+                <div class="credits-content">
+                    <div class="credits-label">Available Credits</div>
+                    <div class="credits-number" id="credits-display">-</div>
+                    <div class="credits-subtext" id="credits-subtext">Loading...</div>
+                </div>
             </div>
 
             <div id="status-message"></div>
@@ -580,6 +679,24 @@
 
         function clearUserFromStorage() {
             localStorage.removeItem('appUser');
+        }
+
+        // Check if user is admin
+        async function checkAdminStatus(email) {
+            try {
+                const response = await fetch(`${WORKER_URL}/check-admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await response.json();
+                
+                if (data.isAdmin) {
+                    document.getElementById('admin-link').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+            }
         }
 
         // Initialize Google Sign-In
@@ -672,6 +789,9 @@
             } else {
                 document.getElementById('user-avatar-fallback').textContent = currentUser.email.charAt(0).toUpperCase();
             }
+
+            // Check admin status
+            await checkAdminStatus(currentUser.email);
 
             // Set email in Stripe buy button
             setTimeout(() => {
@@ -779,6 +899,7 @@
                 document.getElementById('app-screen').style.display = 'none';
                 document.getElementById('login-screen').style.display = 'block';
                 document.getElementById('email-input').value = '';
+                document.getElementById('admin-link').style.display = 'none';
             }
         });
 
