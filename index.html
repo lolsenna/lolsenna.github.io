@@ -548,75 +548,7 @@
             }, 500);
 
             // Load credits
-            await loadCredits();
-        }
-
-        // Load credits from database
-        async function loadCredits() {
-            try {
-                document.getElementById('credits-display').innerHTML = '<div class="loading"></div>';
-                document.getElementById('credits-subtext').textContent = 'Loading...';
-
-                const response = await fetch(`${WORKER_URL}/get-credits`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
-                });
-
-                const data = await response.json();
-
-                document.getElementById('credits-display').textContent = data.credits || 0;
-
-                if (data.credits > 0) {
-                    document.getElementById('credits-subtext').textContent = `${data.totalPurchases || 0} total purchases`;
-                    document.getElementById('use-credit-btn').disabled = false;
-                } else {
-                    document.getElementById('credits-subtext').textContent = 'Purchase credits to get started';
-                    document.getElementById('use-credit-btn').disabled = true;
-                }
-            } catch (error) {
-                console.error('Error loading credits:', error);
-                document.getElementById('credits-display').textContent = '?';
-                document.getElementById('credits-subtext').textContent = 'Error loading credits';
-                showStatus('Error loading credits: ' + error.message, 'error');
-            }
-        }
-
-        // Use a credit
-        async function useCredit() {
-            const btn = document.getElementById('use-credit-btn');
-            const originalHTML = btn.innerHTML;
-
-            try {
-                btn.disabled = true;
-                btn.innerHTML = '<div class="loading"></div> <span>Processing...</span>';
-
-                const response = await fetch(`${WORKER_URL}/use-credit`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: currentUser.email })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    showStatus(`✅ Success! You have ${data.credits} credits remaining.`, 'success');
-                    document.getElementById('credits-display').textContent = data.credits;
-
-                    if (data.credits === 0) {
-                        document.getElementById('credits-subtext').textContent = 'No credits remaining - Purchase more below';
-                        btn.disabled = true;
-                    }
-                } else {
-                    showStatus('⚠️ ' + data.message, 'warning');
-                    btn.disabled = true;
-                }
-            } catch (error) {
-                console.error('Error using credit:', error);
-                showStatus('❌ Error: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = originalHTML;
-            }
+ 
         }
 
         // Show status message
